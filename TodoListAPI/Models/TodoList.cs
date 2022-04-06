@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using TodoListAPI.Models;
 
 namespace TodoListAPI
 {
@@ -10,6 +11,8 @@ namespace TodoListAPI
         public bool IsComplete { get; set; }
         public DateTime DateAdd { get; set; }
         public DateTime DueDate { get; set; }
+
+        public List<TodoSubList> SubLists { get; set; }
 
     }
 }

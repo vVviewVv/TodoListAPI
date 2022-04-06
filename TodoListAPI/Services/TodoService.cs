@@ -1,4 +1,6 @@
-﻿namespace TodoListAPI.Services
+﻿using TodoListAPI.Models;
+
+namespace TodoListAPI.Services
 {
     public class TodoService : ITodoService
     {
@@ -19,7 +21,10 @@
                 Tlist = a.Tlist,
                 IsComplete = a.IsComplete,
                 DateAdd = a.DateAdd,
-                DueDate = a.DueDate
+                DueDate = a.DueDate,
+                SubLists = a.SubLists
+
+
 
             }).ToList();
         }
@@ -36,7 +41,8 @@
                 Tlist = todoList.Tlist,
                 IsComplete = todoList.IsComplete,
                 DateAdd = todoList.DateAdd,
-                DueDate = todoList.DueDate
+                DueDate = todoList.DueDate,
+                SubLists = todoList.SubLists
             };
         }
         public async Task<TodoList> CreateList(TodoList newTodo)
@@ -47,6 +53,7 @@
                 IsComplete = newTodo.IsComplete,
                 DateAdd = newTodo.DateAdd,
                 DueDate = newTodo.DueDate
+
             };
             try
             {
@@ -62,6 +69,11 @@
 
         public async Task<TodoList> UpdateList(int id, TodoList newTodo)
         {
+            var todoList = await _context.TodoLists.FindAsync(id);
+            if (todoList == null)
+            {
+                return null;
+            }
             var todo = _context.TodoLists.First(a => a.Id == id);
             todo.Id = id;
             todo.Tlist = newTodo.Tlist;
@@ -82,6 +94,10 @@
         public async Task<TodoList> DeleteList(int id)
         {
             var todo = _context.TodoLists.Find(id);
+            if (todo == null)
+            {
+                return null;
+            }
             try
             {
                 _context.Remove(todo);
@@ -101,10 +117,128 @@
             };
         }
 
+        public async Task<TodoSubList> GetTodoSubList(int id_sub, int id_list)
+        {
+            var todoList = await _context.TodoLists.FindAsync(id_list);
+            var todoSubList = await _context.TodoSubLists.FindAsync(id_sub);
+            if (todoList == null)
+            {
+                return null;
 
+            }else if(todoSubList == null)
+            {
+                return null;
+            }
+            else if(todoSubList.Id_list != id_list)
+            {
+                return null;
+            }
+            return new TodoSubList() {
+                Id = todoSubList.Id,
+                Slist = todoSubList.Slist,
+                IsComplete = todoSubList.IsComplete,
+                Id_list = todoSubList.Id_list
+            };
 
+        }
 
+        public async Task<TodoSubList> CreateSubList(int id_list, TodoSubList newTodoSub)
+        {
+            var todoList = await _context.TodoLists.FindAsync(id_list);
+            if (todoList == null)
+            {
+                return null;
 
+            }
+            var SubList = new TodoSubList()
+            {
+                //Id = newTodoSub.Id,
+                Slist = newTodoSub.Slist,
+                IsComplete = newTodoSub.IsComplete,
+                Id_list = id_list
+            };
+            try
+            {
+                _context.Add(SubList);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException err)
+            {
+                throw err;
+            }
+            return newTodoSub;
+        }
 
+        public async Task<TodoSubList> UpdateSubList(int id_sub, int id_list, TodoSubList newTodoSub)
+        {
+            var todoList = await _context.TodoLists.FindAsync(id_list);
+            var todoSubList = await _context.TodoSubLists.FindAsync(id_sub);
+            if (todoList == null)
+            {
+                return null;
+
+            }
+            else if (todoSubList == null)
+            {
+                return null;
+            }
+            else if (todoSubList.Id_list != id_list)
+            {
+                return null;
+            }
+            var todo = _context.TodoSubLists.First(a => a.Id == id_sub);
+            todo.Id = id_sub;
+            todo.Slist = newTodoSub.Slist;
+            todo.IsComplete = newTodoSub.IsComplete;
+            todo.Id_list = id_list;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException err)
+            {
+                throw err;
+            }
+            return newTodoSub;
+
+        }
+
+        public async Task<TodoSubList> DeleteSubList(int id_sub, int id_list)
+        {
+            var todoList = await _context.TodoLists.FindAsync(id_list);
+            var todoSubList = await _context.TodoSubLists.FindAsync(id_sub);
+            if (todoList == null)
+            {
+                return null;
+
+            }
+            else if (todoSubList == null)
+            {
+                return null;
+            }
+            else if (todoSubList.Id_list != id_list)
+            {
+                return null;
+            }
+
+            var todo = _context.TodoSubLists.Find(id_sub);
+            try
+            {
+                _context.Remove(todo);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException err)
+            {
+                throw err;
+            }
+            return new TodoSubList()
+            {
+                Id = todo.Id,
+                Slist = todo.Slist,
+                IsComplete = todo.IsComplete,
+                Id_list = id_list
+
+            };
+        }
     }
 }
