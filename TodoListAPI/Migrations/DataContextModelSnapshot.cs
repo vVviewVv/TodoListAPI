@@ -22,6 +22,31 @@ namespace TodoListAPI.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("TodoListAPI.Models.TodoSubList", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("Id_list")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsComplete")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Slist")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id_list");
+
+                    b.ToTable("TodoSubLists");
+                });
+
             modelBuilder.Entity("TodoListAPI.TodoList", b =>
                 {
                     b.Property<int>("Id")
@@ -46,6 +71,22 @@ namespace TodoListAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("TodoLists");
+                });
+
+            modelBuilder.Entity("TodoListAPI.Models.TodoSubList", b =>
+                {
+                    b.HasOne("TodoListAPI.TodoList", "TodoList")
+                        .WithMany("SubLists")
+                        .HasForeignKey("Id_list")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TodoList");
+                });
+
+            modelBuilder.Entity("TodoListAPI.TodoList", b =>
+                {
+                    b.Navigation("SubLists");
                 });
 #pragma warning restore 612, 618
         }

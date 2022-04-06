@@ -4,6 +4,9 @@ global using TodoListAPI.Services;
 global using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
+//dotnet ef migrations add name...
+//dotnet ef database update
+
 // Add services to the container.
 
 builder.Services.AddControllers();
